@@ -23,7 +23,7 @@ cidr_blocks = concat(
   [
   {
     display_name : "GKE Cluster CIDR",
-    cidr_block : format("%s/32", google_compute_subnetwork.subnet.ip_cidr_range)
+    cidr_block : format("%s/32", 192.168.0.10)
   },
 ]
 )
