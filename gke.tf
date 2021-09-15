@@ -8,6 +8,13 @@ variable "gke_password" {
   description = "gke password"
 }
 variable "master_authorized_network_config" {
+  master_authorized_network_config = {
+  cidr_blocks = [
+    {
+      display_name = "office",
+      cidr_block = "100.110.120.130/32"
+    }
+  ]
 }
 
 variable "gke_num_nodes" {
