@@ -7,6 +7,8 @@ variable "gke_password" {
   default     = ""
   description = "gke password"
 }
+variable "master_authorized_network_config" {
+}
 
 variable "gke_num_nodes" {
   default     = 1
