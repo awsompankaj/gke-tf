@@ -22,12 +22,8 @@ cidr_blocks = concat(var.master_authorized_network_config.cidr_blocks,
 [
   {
     display_name : "GKE Cluster CIDR",
-    cidr_block : format("%s/32", google_compute_address.nat_ip.address)
+    cidr_block : format("%s/32", google_compute_subnetwork.subnet.ip_cidr_range)
   },
-  {
-    display_name: "Spinnaker CIDR",
-    cidr_block : format("%s/32", var.spinnaker_ip)
-  }
 ]
 )
 }
