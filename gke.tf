@@ -30,15 +30,37 @@ resource "google_container_cluster" "primary" {
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
+  addons_config {
+    horizontal_pod_autoscaling {
+       disabled  = false
+  }
+  network_policy_config {
+     disabled = false
+  }
+
+}
+  network_policy {
+      enabled  = true
+    }
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
-    master_ipv4_cidr_block  = 10.10.1.0/28
+    master_ipv4_cidr_block  = "10.10.2.0/28"
   }
   cluster_autoscaling {
-    enabled = true
-    resource_limits = cpu
-  }
+       enabled = true
+       resource_limits {
+           minimum       = 1
+           maximum       = 2
+           resource_type = "cpu"
+        }
+       resource_limits {
+           minimum       = 1
+           maximum       = 2
+           resource_type = "memory"
+        }
+    }
+
 }
 
 # Separately Managed Node Pool
