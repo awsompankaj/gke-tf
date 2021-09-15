@@ -21,8 +21,8 @@ variable "machineType" {
 }
 # local api whitelisting
 locals {
-cidr_blocks = concat(var.master_authorized_network_config.cidr_blocks,
-[
+cidr_blocks = concat(
+  [
   {
     display_name : "GKE Cluster CIDR",
     cidr_block : format("%s/32", google_compute_subnetwork.subnet.ip_cidr_range)
