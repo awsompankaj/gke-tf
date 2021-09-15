@@ -16,7 +16,21 @@ variable "machineType" {
   default     = "e2-medium"
   description = "sizing of compute node"
 }
-
+# local api whitelisting
+locals {
+cidr_blocks = concat(var.master_authorized_network_config.cidr_blocks,
+[
+  {
+    display_name : "GKE Cluster CIDR",
+    cidr_block : format("%s/32", google_compute_address.nat_ip.address)
+  },
+  {
+    display_name: "Spinnaker CIDR",
+    cidr_block : format("%s/32", var.spinnaker_ip)
+  }
+]
+)
+}
 
 # GKE cluster
 resource "google_container_cluster" "primary" {
@@ -27,7 +41,10 @@ resource "google_container_cluster" "primary" {
   # node pool and immediately delete it.
   remove_default_node_pool = true
   initial_node_count       = 1
-
+  ip_allocation_policy {
+  cluster_secondary_range_name  = google_compute_subnetwork.subnet.secondary_ip_range.0.range_name
+  services_secondary_range_name = google_compute_subnetwork.subnet.secondary_ip_range.1.range_name
+   }
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
   addons_config {
@@ -47,6 +64,19 @@ resource "google_container_cluster" "primary" {
     enable_private_endpoint = false
     master_ipv4_cidr_block  = "10.10.2.0/28"
   }
+  master_authorized_networks_config {
+  dynamic "cidr_blocks" {
+    for_each = [for cidr_block in local.cidr_blocks: {
+      display_name = cidr_block.cidr_block
+      cidr_block = cidr_block.cidr_block
+    }]
+    content {
+      cidr_block = cidr_blocks.value.cidr_block
+      display_name = cidr_blocks.value.display_name
+
+    }
+  }
+}
   cluster_autoscaling {
        enabled = true
        resource_limits {
