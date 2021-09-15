@@ -25,12 +25,12 @@ resource "google_compute_subnetwork" "subnet" {
   network       = google_compute_network.vpc.id
   secondary_ip_range {
     range_name    = "services-range"
-    ip_cidr_range = "192.168.1.0/24"
+    ip_cidr_range = "192.168.0.0/16"
   }
 
   secondary_ip_range {
     range_name    = "pod-ranges"
-    ip_cidr_range = "192.168.64.0/22"
+    ip_cidr_range = "172.16.0.0/16"
   }
 }
 

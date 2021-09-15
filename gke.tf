@@ -25,6 +25,14 @@ cidr_blocks = concat(
     display_name : "GKE Cluster CIDR",
     cidr_block : format("%s/32", "192.168.0.10")
   },
+  {
+    display_name : "GKE subnet",
+    cidr_block : format("%s/32", "192.168.0.12")
+  },
+  {
+    display_name : "home access",
+    cidr_block : format("%s/32", "103.149.126.200")
+  },
 ]
 )
 }
@@ -59,12 +67,12 @@ resource "google_container_cluster" "primary" {
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
-    master_ipv4_cidr_block  = "10.10.2.0/28"
+    master_ipv4_cidr_block  = "10.10.0.0/28"
   }
   master_authorized_networks_config {
   dynamic "cidr_blocks" {
     for_each = [for cidr_block in local.cidr_blocks: {
-      display_name = cidr_block.cidr_block
+      display_name = cidr_block.display_name
       cidr_block = cidr_block.cidr_block
     }]
     content {
