@@ -149,15 +149,26 @@ resource "google_container_node_pool" "primary_nodes" {
 # # https://learn.hashicorp.com/terraform/kubernetes/provision-gke-cluster#optional-configure-terraform-kubernetes-provider
 # # To learn how to schedule deployments and services using the provider, go here: https://learn.hashicorp.com/tutorials/terraform/kubernetes-provider.
 
-# provider "kubernetes" {
-#   load_config_file = "false"
+data "google_client_config" "default" {}
+data "google_container_cluster" "primary" {
+  name     = "${var.project_id}-gke"
+  location = var.region
+  depends_on = [
+    google_container_node_pool.primary_nodes,
+    google_container_cluster.primary
+  ]
+}
 
-#   host     = google_container_cluster.primary.endpoint
-#   username = var.gke_username
-#   password = var.gke_password
+provider "kubernetes" {
+  host                   = "https://${data.google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(data.google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+}
 
-#   client_certificate     = google_container_cluster.primary.master_auth.0.client_certificate
-#   client_key             = google_container_cluster.primary.master_auth.0.client_key
-#   cluster_ca_certificate = google_container_cluster.primary.master_auth.0.cluster_ca_certificate
-# }
-
+provider "helm" {
+  kubernetes {
+  host                   = "https://${data.google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(data.google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+  }
+}
