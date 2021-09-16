@@ -61,6 +61,15 @@ resource "google_container_cluster" "primary" {
   }
 
 }
+  node_locations = [
+    "us-central1-a",
+    "us-central1-b",
+    "us-central1-c",
+  ] 
+
+  workload_identity_config {
+    identity_namespace = "${var.project_id}.svc.id.goog"
+  }
   network_policy {
       enabled  = true
     }
@@ -105,6 +114,10 @@ resource "google_container_node_pool" "primary_nodes" {
   cluster    = google_container_cluster.primary.name
   node_count = var.gke_num_nodes
 
+    autoscaling {
+      min_node_count  = 2
+      max_node_count  = 10
+    }
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
@@ -112,9 +125,13 @@ resource "google_container_node_pool" "primary_nodes" {
     ]
 
     labels = {
-      env = var.project_id
+      confidentiality = "C2"
+      managed_by      = "vijay"
+      environment     = "dev"
     }
-
+    workload_metadata_config {
+      node_metadata = "GKE_METADATA_SERVER"
+    }
     # preemptible  = true
     machine_type = var.machineType
     tags         = ["gke-node", "${var.project_id}-gke"]
