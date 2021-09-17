@@ -23,6 +23,11 @@ resource "google_compute_subnetwork" "subnet" {
   ip_cidr_range = "10.2.0.0/16"
   region        = var.region
   network       = google_compute_network.vpc.id
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
   secondary_ip_range {
     range_name    = "services-range"
     ip_cidr_range = "192.168.0.0/16"
