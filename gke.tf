@@ -149,7 +149,9 @@ resource "google_container_node_pool" "primary_nodes" {
 # # https://learn.hashicorp.com/terraform/kubernetes/provision-gke-cluster#optional-configure-terraform-kubernetes-provider
 # # To learn how to schedule deployments and services using the provider, go here: https://learn.hashicorp.com/tutorials/terraform/kubernetes-provider.
 
-data "google_client_config" "default" {}
+data "google_client_config" "default" {
+  depends_on = [ google_container_cluster.primary ]
+}
 data "google_container_cluster" "primary" {
   name     = "${var.project_id}-gke"
   location = var.region

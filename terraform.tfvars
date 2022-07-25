@@ -1,4 +1,4 @@
-project_id = "mylab-324007"
+project_id = "krlab-012"
 region     = "us-central1"
 gke_username = "vijay@mevijay.com"
 gke_password = "redhat123"
